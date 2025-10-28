@@ -1,23 +1,55 @@
-import { NavigationContainer } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useColorScheme } from 'react-native';
+import AnimatedBackground from './src/components/AnimatedBackground';
 import DetailsScreen from './src/screens/DetailsScreen';
 import FavoritesScreen from './src/screens/FavoritesScreen';
 import ForecastScreen from './src/screens/ForecastScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
+import { ThemeContext, ThemeProvider } from './src/theme/ThemeContext';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const scheme = useColorScheme();
+
+  const FuturisticDarkTheme = {
+    ...DarkTheme,
+    colors: {
+      ...DarkTheme.colors,
+      background: '#0B0F14',
+      card: '#0F1621',
+      text: '#E6EDF3',
+      border: '#1B2837',
+      primary: '#5EE1FF',
+      notification: '#7D5CFF',
+    },
+  };
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="pocetna" component={HomeScreen} />
-        <Stack.Screen name="detalji" component={DetailsScreen} />
-        <Stack.Screen name="prognoza" component={ForecastScreen} />
-        <Stack.Screen name="postavke" component={SettingsScreen} />
-        <Stack.Screen name="omiljeni" component={FavoritesScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <ThemeProvider>
+      <ThemeContext.Consumer>
+        {({ isDark, accent }) => (
+          <NavigationContainer theme={isDark ? FuturisticDarkTheme : DefaultTheme}>
+            <AnimatedBackground accent={accent} />
+            <Stack.Navigator
+              screenOptions={{
+                headerStyle: { backgroundColor: isDark ? '#0F1621' : '#FFFFFF' },
+                headerTitleStyle: { fontWeight: '700', letterSpacing: 0.5 },
+                headerTintColor: isDark ? '#E6EDF3' : '#0B0F14',
+                contentStyle: { backgroundColor: isDark ? '#0B0F14' : '#F7F9FC' },
+              }}
+            >
+              <Stack.Screen name="pocetna" component={HomeScreen} options={{ title: 'Vrijeme' }} />
+              <Stack.Screen name="detalji" component={DetailsScreen} options={{ title: 'Detalji' }} />
+              <Stack.Screen name="prognoza" component={ForecastScreen} options={{ title: 'Prognoza' }} />
+              <Stack.Screen name="postavke" component={SettingsScreen} options={{ title: 'Postavke' }} />
+              <Stack.Screen name="omiljeni" component={FavoritesScreen} options={{ title: 'Omiljeni' }} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        )}
+      </ThemeContext.Consumer>
+    </ThemeProvider>
   );
 }

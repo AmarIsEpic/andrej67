@@ -1,35 +1,44 @@
-import { useState } from 'react';
-import { StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { useContext, useState } from 'react';
+import { Alert, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { ThemeContext } from '../theme/ThemeContext';
 
 export default function SettingsScreen() {
     const [isCelsius, setIsCelsius] = useState(true);
-    const [isDarkMode, setIsDarkMode] = useState(false);
+    const { mode, setMode, isDark, toggleDark } = useContext(ThemeContext);
 
     const handleButton = (type) => {
-        if (type === 'reset') Alet.alert('Postavke resetovane!');
+        if (type === 'reset') Alert.alert('Postavke', 'Postavke resetovane!');
     }
  
 
 return (
-    <View style={[styles.container, isDarkMode && styles.darkContainer]}>
-        <Text style={[styles.title, isDarkMode && styles.darkText]}>Postavke</Text>
+    <View style={[styles.container, isDark && styles.darkContainer]}>
+        <Text style={[styles.title, isDark && styles.darkText]}>Postavke</Text>
 
         <View style={styles.row}>
-            <Text style={[styles.label, isDarkMode && styles.darkText]}>Koristiti °C</Text>
+            <Text style={[styles.label, isDark && styles.darkText]}>Koristiti °C</Text>
             <Switch value={isCelsius} onValueChange={() => setIsCelsius(!isCelsius)} />
         </View>
 
         <View style={styles.row}>
-            <Text style={[styles.label, isDarkMode && styles.darkText]}>Tamni režim</Text>
-            <Switch value={isDarkMode} onValueChange={() => setIsDarkMode(!isDarkMode)} />
+            <Text style={[styles.label, isDark && styles.darkText]}>Tamni režim</Text>
+            <Switch value={isDark} onValueChange={toggleDark} disabled={mode === 'system'} />
+        </View>
+
+        <View style={styles.row}>
+            <Text style={[styles.label, isDark && styles.darkText]}>Prati sistem</Text>
+            <Switch
+                value={mode === 'system'}
+                onValueChange={(v) => setMode(v ? 'system' : (isDark ? 'dark' : 'light'))}
+            />
         </View>
 
         <TouchableOpacity style={styles.optionButton} onPress={() => handleButton('reset')}>
-            <Text styee={styles.optionText}>Resetuj postavke</Text>
+            <Text style={styles.optionText}>Resetuj postavke</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.saveButton}>
-            <Text styee={styles.saveText}>Sacuvaj postavke</Text>
+        <TouchableOpacity style={styles.saveButton} onPress={() => Alert.alert('Sačuvano', 'Postavke su sačuvane.') }>
+            <Text style={styles.saveText}>Sačuvaj postavke</Text>
         </TouchableOpacity>
     </View>
 );

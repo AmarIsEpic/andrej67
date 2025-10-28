@@ -1,11 +1,13 @@
 import * as Location from 'expo-location';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, StyleSheet, Text, View } from 'react-native';
+import { ThemeContext } from '../theme/ThemeContext';
 
 export default function LocationScreen() {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
   const apiKey = 'ed0604f6922da175d2395178306397bd';
+  const { setAccentFromWeather } = useContext(ThemeContext);
 
   useEffect(() => {
     (async () => {
@@ -25,6 +27,10 @@ export default function LocationScreen() {
         );
         const data = await response.json();
         setWeather(data);
+        try {
+          const condition = data?.weather?.[0]?.main || data?.weather?.[0]?.description;
+          setAccentFromWeather(condition);
+        } catch {}
       } catch (error) {
         console.error('Greška pri dohvaćanju vremena:', error);
         Alert.alert('Greška', 'Neuspješno dohvaćanje vremenskih podataka.');
@@ -37,8 +43,8 @@ export default function LocationScreen() {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#007AFF" />
-        <Text style={{ marginTop: 10 }}>Dohvaćam lokaciju...</Text>
+        <ActivityIndicator size="large" color="#5EE1FF" />
+        <Text style={styles.loadingText}>Dohvaćam lokaciju...</Text>
       </View>
     );
   }
@@ -46,7 +52,7 @@ export default function LocationScreen() {
   if (!weather || !weather.main) {
     return (
       <View style={styles.center}>
-        <Text>Neuspješno dohvaćanje podataka o vremenu.</Text>
+        <Text style={styles.errorText}>Neuspješno dohvaćanje podataka o vremenu.</Text>
       </View>
     );
   }
@@ -56,19 +62,20 @@ export default function LocationScreen() {
       <Text style={styles.title}>Vrijeme na tvojoj lokaciji</Text>
       <Text style={styles.city}>{weather.name}</Text>
 
-      <Image
-        source={{ uri: `https://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png` }}
-        style={{ width: 150, height: 150 }}
-      />
-
-      <Text style={styles.temp}>{Math.round(weather.main.temp)}°C</Text>
-      <Text style={styles.desc}>{weather.weather[0].description}</Text>
+      <View style={styles.hero}>
+        <Image
+          source={{ uri: `https://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png` }}
+          style={{ width: 150, height: 150 }}
+        />
+        <Text style={styles.temp}>{Math.round(weather.main.temp)}°C</Text>
+        <Text style={styles.desc}>{weather.weather[0].description}</Text>
+      </View>
 
       <View style={styles.infoBox}>
-        <Text>Osjećaj: {Math.round(weather.main.feels_like)}°C</Text>
-        <Text>Vlažnost: {weather.main.humidity}%</Text>
-        <Text>Pritisak: {weather.main.pressure} hPa</Text>
-        <Text>Vjetar: {weather.wind.speed} m/s</Text>
+        <View style={styles.row}><Text style={styles.label}>Osjećaj</Text><Text style={styles.value}>{Math.round(weather.main.feels_like)}°C</Text></View>
+        <View style={styles.row}><Text style={styles.label}>Vlažnost</Text><Text style={styles.value}>{weather.main.humidity}%</Text></View>
+        <View style={styles.row}><Text style={styles.label}>Pritisak</Text><Text style={styles.value}>{weather.main.pressure} hPa</Text></View>
+        <View style={styles.row}><Text style={styles.label}>Vjetar</Text><Text style={styles.value}>{weather.wind.speed} m/s</Text></View>
       </View>
     </View>
   );
@@ -77,37 +84,60 @@ export default function LocationScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#0B0F14',
   },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#0B0F14',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: '#E6EDF3',
   },
   city: {
     fontSize: 22,
     fontWeight: 'bold',
+    color: '#E6EDF3',
+  },
+  hero: {
+    marginTop: 8,
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(94,225,255,0.12)'
   },
   temp: {
-    fontSize: 50,
+    fontSize: 56,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#5EE1FF',
   },
   desc: {
     fontSize: 18,
     marginBottom: 10,
     textTransform: 'capitalize',
+    color: '#B8C4CF',
   },
   infoBox: {
-    marginTop: 10,
-    alignItems: 'center',
+    width: '100%',
+    marginTop: 16,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 16,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(125,92,255,0.15)'
   },
+  row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 6 },
+  label: { color: '#B8C4CF' },
+  value: { color: '#E6EDF3', fontWeight: '600' },
+  loadingText: { color: '#B8C4CF', marginTop: 10 },
+  errorText: { color: '#FF7D7D' },
 });
