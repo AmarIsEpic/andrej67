@@ -5,10 +5,13 @@ export const ThemeContext = createContext({
   mode: 'system', // 'system' | 'light' | 'dark'
   isDark: true,
   accent: '#5EE1FF',
+  units: 'metric', // 'metric' | 'imperial'
   setMode: (_m) => {},
   toggleDark: () => {},
   setAccent: (_c) => {},
   setAccentFromWeather: (_cond) => {},
+  setUnits: (_u) => {},
+  toggleUnits: () => {},
 });
 
 function pickAccentFromCondition(condition) {
@@ -26,6 +29,7 @@ export function ThemeProvider({ children }) {
   const systemScheme = useColorScheme();
   const [mode, setMode] = useState('system');
   const [accent, setAccent] = useState('#5EE1FF');
+  const [units, setUnits] = useState('metric');
 
   const isDark = mode === 'system' ? systemScheme === 'dark' : mode === 'dark';
 
@@ -41,9 +45,13 @@ export function ThemeProvider({ children }) {
     setAccent(pickAccentFromCondition(condition));
   }, []);
 
+  const toggleUnits = useCallback(() => {
+    setUnits((u) => (u === 'metric' ? 'imperial' : 'metric'));
+  }, []);
+
   const value = useMemo(
-    () => ({ mode, setMode, isDark, accent, toggleDark, setAccent, setAccentFromWeather }),
-    [mode, setMode, isDark, accent, toggleDark, setAccentFromWeather]
+    () => ({ mode, setMode, isDark, accent, units, setUnits, toggleUnits, toggleDark, setAccent, setAccentFromWeather }),
+    [mode, setMode, isDark, accent, units, setUnits, toggleUnits, toggleDark, setAccentFromWeather]
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

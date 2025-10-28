@@ -1,7 +1,7 @@
 import React from 'react';
 import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
 
-export default function WeeklyForecast({ days = [], isDark }) {
+export default function WeeklyForecast({ days = [], isDark, units = 'metric' }) {
   return (
     <View style={{ marginTop: 16 }}>
       <Text style={[styles.title, isDark && { color: '#E8E6E3' }]}>5 dana</Text>
@@ -14,7 +14,7 @@ export default function WeeklyForecast({ days = [], isDark }) {
           <View style={[styles.card, isDark && styles.cardDark]}>
             <Text style={[styles.day, isDark && { color: '#B8C0CC' }]}>{new Date(item.date).toLocaleDateString(undefined, { weekday: 'short' })}</Text>
             <Image source={{ uri: `https://openweathermap.org/img/wn/${item.icon}.png` }} style={{ width: 36, height: 36 }} />
-            <Text style={[styles.temp, isDark && { color: '#E8E6E3' }]}>{item.temp}°</Text>
+            <Text style={[styles.temp, isDark && { color: '#E8E6E3' }]}>{item.temp}°{units==='imperial' ? 'F' : ''}</Text>
           </View>
         )}
       />

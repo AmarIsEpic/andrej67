@@ -1,7 +1,7 @@
 import React from 'react';
 import { FlatList, Image, StyleSheet, Text, View } from 'react-native';
 
-export default function HourlyForecast({ list = [], isDark }) {
+export default function HourlyForecast({ list = [], isDark, units = 'metric' }) {
   return (
     <View style={{ marginTop: 16 }}>
       <Text style={[styles.title, isDark && { color: '#E8E6E3' }]}>Po satima</Text>
@@ -17,7 +17,7 @@ export default function HourlyForecast({ list = [], isDark }) {
             <View style={[styles.card, isDark && styles.cardDark]}>
               <Text style={[styles.time, isDark && { color: '#B8C0CC' }]}>{time}</Text>
               <Image source={{ uri: icon }} style={{ width: 36, height: 36 }} />
-              <Text style={[styles.temp, isDark && { color: '#E8E6E3' }]}>{Math.round(item.main.temp)}°</Text>
+              <Text style={[styles.temp, isDark && { color: '#E8E6E3' }]}>{Math.round(item.main.temp)}°{units==='imperial' ? 'F' : ''}</Text>
             </View>
           );
         }}

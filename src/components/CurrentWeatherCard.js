@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, Text } from 'react-native';
 import { iconForCondition } from '../theme/cozyTheme';
 
-export default function CurrentWeatherCard({ temp, condition, isDark }) {
+export default function CurrentWeatherCard({ temp, condition, isDark, units = 'metric' }) {
   const scale = useRef(new Animated.Value(0.95)).current;
   useEffect(() => {
     Animated.timing(scale, { toValue: 1, duration: 450, easing: Easing.out(Easing.quad), useNativeDriver: true }).start();
@@ -12,7 +12,7 @@ export default function CurrentWeatherCard({ temp, condition, isDark }) {
   return (
     <Animated.View style={[styles.card, { transform: [{ scale }] }, isDark && styles.cardDark]}>
       <MaterialCommunityIcons name={iconForCondition(condition)} size={56} color={isDark ? '#FFB070' : '#FFB4A2'} />
-      <Text style={[styles.temp, isDark && { color: '#E8E6E3' }]}>{Math.round(temp)}°</Text>
+      <Text style={[styles.temp, isDark && { color: '#E8E6E3' }]}>{Math.round(temp)}°{units==='imperial' ? 'F' : ''}</Text>
       <Text style={[styles.cond, isDark && { color: '#B8C0CC' }]}>{condition}</Text>
     </Animated.View>
   );
