@@ -71,7 +71,7 @@ export default function HomeScreen({ navigation }) {
         {weather && weather.main && (
           <View>
             <CurrentWeatherCard isDark temp={weather.main.temp} condition={weather.weather[0].description} units={units} />
-            <WeatherDetails isDark feelsLike={weather.main.feels_like} humidity={weather.main.humidity} wind={weather.wind.speed} />
+            <WeatherDetails isDark feelsLike={weather.main.feels_like} humidity={weather.main.humidity} wind={weather.wind.speed} units={units} />
           </View>
         )}
 

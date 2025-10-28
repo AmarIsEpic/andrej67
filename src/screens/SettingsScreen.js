@@ -1,100 +1,175 @@
-import { useContext, useState } from 'react';
-import { Alert, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useContext } from 'react';
+import { ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { ThemeContext } from '../theme/ThemeContext';
-import ThemeSwitcher from '../components/ThemeSwitcher';
 
 export default function SettingsScreen() {
-    const [isCelsius, setIsCelsius] = useState(true);
-    const { mode, setMode, isDark, toggleDark } = useContext(ThemeContext);
+    const { 
+        mode, setMode, isDark, toggleDark, 
+        units, toggleUnits, 
+        backgroundAnimation, toggleBackgroundAnimation 
+    } = useContext(ThemeContext);
 
-    const handleButton = (type) => {
-        if (type === 'reset') Alert.alert('Postavke', 'Postavke resetovane!');
-    }
- 
-
-return (
-    <View style={[styles.container, isDark && styles.darkContainer]}>
-        <Text style={[styles.title, isDark && styles.darkText]}>Postavke</Text>
-
-        <View style={styles.row}>
-            <Text style={[styles.label, isDark && styles.darkText]}>Koristiti °C</Text>
-            <Switch value={isCelsius} onValueChange={() => setIsCelsius(!isCelsius)} />
+    const SettingItem = ({ icon, iconColor, label, description, value, onValueChange, disabled = false }) => (
+        <View style={[styles.settingCard, isDark && styles.settingCardDark]}>
+            <View style={styles.settingLeft}>
+                <Ionicons name={icon} size={24} color={iconColor} />
+                <View style={styles.settingTextContainer}>
+                    <Text style={[styles.settingLabel, isDark && styles.textDark]}>{label}</Text>
+                    <Text style={[styles.settingDescription, isDark && styles.textSecondaryDark]}>{description}</Text>
+                </View>
+            </View>
+            <Switch 
+                value={value} 
+                onValueChange={onValueChange} 
+                disabled={disabled}
+                trackColor={{ false: isDark ? '#1B2837' : '#E0E0E0', true: isDark ? '#2A3A4F' : '#5EE1FF' }}
+                thumbColor={value ? '#5EE1FF' : '#F4F3F4'}
+            />
         </View>
+    );
 
-        <View style={styles.row}>
-            <Text style={[styles.label, isDark && styles.darkText]}>Tamni režim</Text>
-            <Switch value={isDark} onValueChange={toggleDark} disabled={mode === 'system'} />
-        </View>
+    return (
+        <ScrollView style={[styles.container, isDark && styles.containerDark]} contentContainerStyle={styles.content}>
+            <Text style={[styles.title, isDark && styles.textDark]}>Postavke</Text>
 
-        <View style={styles.row}>
-            <Text style={[styles.label, isDark && styles.darkText]}>Prati sistem</Text>
-            <Switch
+            <Text style={[styles.sectionTitle, isDark && styles.textDark]}>Tema i Prikaz</Text>
+            
+            <SettingItem
+                icon="phone-portrait-outline"
+                iconColor="#8AB4F8"
+                label="Prati sistem"
+                description="Automatsko prebacivanje teme"
                 value={mode === 'system'}
                 onValueChange={(v) => setMode(v ? 'system' : (isDark ? 'dark' : 'light'))}
             />
-        </View>
 
-        <TouchableOpacity style={styles.optionButton} onPress={() => handleButton('reset')}>
-            <Text style={styles.optionText}>Resetuj postavke</Text>
-        </TouchableOpacity>
+            <SettingItem
+                icon={isDark ? 'moon' : 'sunny'}
+                iconColor={isDark ? '#7D5CFF' : '#FFD369'}
+                label="Tamni režim"
+                description="Ručno prebacivanje teme"
+                value={isDark}
+                onValueChange={toggleDark}
+                disabled={mode === 'system'}
+            />
 
-        <TouchableOpacity style={styles.saveButton} onPress={() => Alert.alert('Sačuvano', 'Postavke su sačuvane.') }>
-            <Text style={styles.saveText}>Sačuvaj postavke</Text>
-        </TouchableOpacity>
+            <SettingItem
+                icon="snow-outline"
+                iconColor="#B3F0FF"
+                label="Animacija pozadine"
+                description="Omogući/onemogući animaciju"
+                value={backgroundAnimation}
+                onValueChange={toggleBackgroundAnimation}
+            />
 
-        <ThemeSwitcher />
-    </View>
-);
+            <Text style={[styles.sectionTitle, isDark && styles.textDark]}>Mjerenja</Text>
+
+            <SettingItem
+                icon="thermometer-outline"
+                iconColor="#FFB4A2"
+                label={units === 'metric' ? 'Celsius (°C)' : 'Fahrenheit (°F)'}
+                description="Jedinice za temperaturu"
+                value={units === 'imperial'}
+                onValueChange={toggleUnits}
+            />
+
+            <View style={[styles.infoCard, isDark && styles.infoCardDark]}>
+                <Ionicons name="information-circle-outline" size={24} color={isDark ? '#8AB4F8' : '#5EE1FF'} />
+                <Text style={[styles.infoText, isDark && styles.textDark]}>
+                    Sve postavke se automatski čuvaju i primjenjuju na svim ekranima.
+                </Text>
+            </View>
+        </ScrollView>
+    );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
-        backgroundColor: '#fff',
+        backgroundColor: '#F7F9FC',
     },
-    darkContainer: {
-        backgroundColor: '#333',
+    containerDark: {
+        backgroundColor: '#0B0F14',
+    },
+    content: {
+        padding: 20,
     },
     title: {
-        fontSize: 26,
+        fontSize: 32,
         fontWeight: 'bold',
-        marginBottom: 20,
+        marginBottom: 32,
+        color: '#0B0F14',
+        fontFamily: 'Nunito_800ExtraBold',
     },
-    darkText: {
-        color: '#fff',
+    textDark: {
+        color: '#E6EDF3',
     },
-    row: {
+    textSecondaryDark: {
+        color: '#B8C4CF',
+    },
+    sectionTitle: {
+        fontSize: 20,
+        fontWeight: '700',
+        marginTop: 24,
+        marginBottom: 16,
+        color: '#0B0F14',
+        fontFamily: 'Nunito_700Bold',
+    },
+    settingCard: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginVertical: 10,
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: 'rgba(94,225,255,0.15)',
     },
-    label: {
-        fontSize: 18,
-        color: '#444'
+    settingCardDark: {
+        backgroundColor: 'rgba(15,22,33,0.6)',
+        borderColor: 'rgba(94,225,255,0.15)',
     },
-    optionButton: {
-        backgroundColor: '#ddd',
-        paddingVertical: 12,
-        borderRadius: 10,
+    settingLeft: {
+        flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 10,
+        flex: 1,
+        marginRight: 16,
     },
-    optionText: {
+    settingTextContainer: {
+        marginLeft: 12,
+        flex: 1,
+    },
+    settingLabel: {
         fontSize: 16,
-        color: '#333'
+        fontWeight: '600',
+        color: '#0B0F14',
+        marginBottom: 4,
     },
-    saveButton: {
-        marginTop: 25,
-        backgroundColor: '#096ee2ff',
-        paddingVertical: 12,
-        borderRadius: 10,
-        alignItems: 'center'
+    settingDescription: {
+        fontSize: 13,
+        color: '#6B7280',
+        lineHeight: 18,
     },
-    saveText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold'
+    infoCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        borderRadius: 16,
+        padding: 16,
+        marginTop: 32,
+        borderWidth: 1,
+        borderColor: 'rgba(94,225,255,0.15)',
+    },
+    infoCardDark: {
+        backgroundColor: 'rgba(15,22,33,0.6)',
+    },
+    infoText: {
+        flex: 1,
+        fontSize: 14,
+        color: '#0B0F14',
+        marginLeft: 12,
+        lineHeight: 20,
     },
 });

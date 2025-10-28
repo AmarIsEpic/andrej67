@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Nunito_400Regular, Nunito_700Bold, Nunito_800ExtraBold, useFonts } from '@expo-google-fonts/nunito';
 import { Quicksand_600SemiBold } from '@expo-google-fonts/quicksand';
 import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
@@ -50,7 +51,22 @@ export default function App() {
                 contentStyle: { backgroundColor: isDark ? '#0B0F14' : '#F7F9FC' },
               }}
             >
-              <Stack.Screen name="pocetna" component={HomeScreen} options={{ title: 'Vrijeme' }} />
+              <Stack.Screen 
+                name="pocetna" 
+                component={HomeScreen} 
+                options={({ navigation }) => ({
+                  title: 'Vrijeme',
+                  headerRight: () => (
+                    <Ionicons
+                      name="settings"
+                      size={24}
+                      color={isDark ? '#E6EDF3' : '#0B0F14'}
+                      style={{ marginRight: 16 }}
+                      onPress={() => navigation.navigate('postavke')}
+                    />
+                  ),
+                })}
+              />
               <Stack.Screen name="detalji" component={DetailsScreen} options={{ title: 'Detalji' }} />
               <Stack.Screen name="prognoza" component={ForecastScreen} options={{ title: 'Prognoza' }} />
               <Stack.Screen name="postavke" component={SettingsScreen} options={{ title: 'Postavke' }} />

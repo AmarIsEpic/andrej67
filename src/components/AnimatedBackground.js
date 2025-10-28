@@ -1,11 +1,15 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
+import { ThemeContext } from '../theme/ThemeContext';
 
 export default function AnimatedBackground({ accent = '#5EE1FF' }) {
+  const { backgroundAnimation } = useContext(ThemeContext);
   const a1 = useRef(new Animated.Value(0)).current;
   const a2 = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    if (!backgroundAnimation) return;
+    
     const loop = () => {
       Animated.loop(
         Animated.parallel([
@@ -15,10 +19,14 @@ export default function AnimatedBackground({ accent = '#5EE1FF' }) {
       ).start();
     };
     loop();
-  }, [a1, a2]);
+  }, [a1, a2, backgroundAnimation]);
 
   const t1 = a1.interpolate({ inputRange: [0, 1], outputRange: [-30, 30] });
   const t2 = a2.interpolate({ inputRange: [0, 1], outputRange: [30, -30] });
+
+  if (!backgroundAnimation) {
+    return null;
+  }
 
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>

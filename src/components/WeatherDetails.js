@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-export default function WeatherDetails({ feelsLike, humidity, wind, isDark }) {
+export default function WeatherDetails({ feelsLike, humidity, wind, isDark, units = 'metric' }) {
   const Item = ({ label, value }) => (
     <View style={[styles.item, isDark && styles.itemDark]}>
       <Text style={[styles.label, isDark && styles.darkText]}>{label}</Text>
@@ -10,7 +10,7 @@ export default function WeatherDetails({ feelsLike, humidity, wind, isDark }) {
   );
   return (
     <View style={styles.row}>
-      <Item label="Osjećaj" value={`${Math.round(feelsLike)}°`} />
+      <Item label="Osjećaj" value={`${Math.round(feelsLike)}°${units === 'imperial' ? 'F' : 'C'}`} />
       <Item label="Vlažnost" value={`${humidity}%`} />
       <Item label="Vjetar" value={`${wind} m/s`} />
     </View>
