@@ -11,7 +11,7 @@ import { gradientForCondition } from '../theme/cozyTheme';
 import { ThemeContext } from '../theme/ThemeContext';
 
 export default function HomeScreen({ navigation }) {
-  const { setAccentFromWeather } = useContext(ThemeContext);
+  const { setAccentFromWeather, units, toggleUnits } = useContext(ThemeContext);
   const [city, setCity] = useState('');
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -22,7 +22,7 @@ export default function HomeScreen({ navigation }) {
     if (!city) return;
     setLoading(true);
     setError('');
-    const data = await getWeather(city);
+    const data = await getWeather(city, units);
     if (!data || (data.cod && Number(data.cod) !== 200)) {
       setError('Grad nije pronađen. Pokušaj ponovo.');
       setWeather(null);
@@ -36,7 +36,7 @@ export default function HomeScreen({ navigation }) {
       setAccentFromWeather(condition);
     } catch {}
     try {
-      const f = await getForecast(city);
+      const f = await getForecast(city, units);
       setForecast(f);
     } catch {}
   };
@@ -70,15 +70,15 @@ export default function HomeScreen({ navigation }) {
 
         {weather && weather.main && (
           <View>
-            <CurrentWeatherCard isDark temp={weather.main.temp} condition={weather.weather[0].description} />
+            <CurrentWeatherCard isDark temp={weather.main.temp} condition={weather.weather[0].description} units={units} />
             <WeatherDetails isDark feelsLike={weather.main.feels_like} humidity={weather.main.humidity} wind={weather.wind.speed} />
           </View>
         )}
 
         {forecast?.list && (
           <>
-            <HourlyForecast isDark list={forecast.list} />
-            <WeeklyForecast isDark days={groupDaily(forecast.list)} />
+            <HourlyForecast isDark list={forecast.list} units={units} />
+            <WeeklyForecast isDark days={groupDaily(forecast.list)} units={units} />
           </>
         )}
       </ScrollView>

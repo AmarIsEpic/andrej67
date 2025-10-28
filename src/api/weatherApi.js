@@ -2,10 +2,10 @@ const API_KEY = 'ed0604f6922da175d2395178306397bd';
 const BASE_URL = 'https://api.openweathermap.org/data/2.5/weather';
 const FORECAST_URL = 'https://api.openweathermap.org/data/2.5/forecast';
 
-export async function getWeather(city) {
+export async function getWeather(city, units = 'metric') {
   try {
     const response = await fetch(
-      `${BASE_URL}?q=${city}&units=metric&appid=${API_KEY}&lang=hr`
+      `${BASE_URL}?q=${city}&units=${units}&appid=${API_KEY}&lang=hr`
     );
     const data = await response.json();
     return data;
@@ -14,10 +14,10 @@ export async function getWeather(city) {
   }
 }
 
-export async function getForecast(city) {
+export async function getForecast(city, units = 'metric') {
   try {
     const response = await fetch(
-      `${FORECAST_URL}?q=${city}&units=metric&appid=${API_KEY}&lang=hr`
+      `${FORECAST_URL}?q=${city}&units=${units}&appid=${API_KEY}&lang=hr`
     );
     const data = await response.json();
     return data; // has list (3-hourly)
