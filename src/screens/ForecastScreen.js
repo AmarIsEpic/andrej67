@@ -38,11 +38,14 @@ export default function ForecastScreen({ route }) {
       <FlatList
         data={forecast}
         keyExtractor={(_item, index) => index.toString()}
+        ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
         renderItem={({ item }) => (
           <View style={styles.item}>
-            <Text style={styles.time}>{item.dt_txt}</Text>
-            <Text>{Math.round(item.main.temp)}°C</Text>
-            <Text>{item.weather[0].description}</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.time}>{item.dt_txt}</Text>
+              <Text style={styles.desc}>{item.weather[0].description}</Text>
+            </View>
+            <Text style={styles.temp}>{Math.round(item.main.temp)}°C</Text>
           </View>
         )}
       />
@@ -54,25 +57,42 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: '#0B0F14',
     },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#0B0F14',
     },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
+    color: '#E6EDF3',
     },
   item: {
-    backgroundColor: '#f0f0f0',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(94,225,255,0.12)'
   },
   time: {
     fontWeight: 'bold',
+    color: '#E6EDF3',
   },
+  desc: {
+    color: '#B8C4CF',
+    marginTop: 2,
+    textTransform: 'capitalize',
+  },
+  temp: {
+    color: '#5EE1FF',
+    fontWeight: '700',
+    fontSize: 18,
+  }
 });
