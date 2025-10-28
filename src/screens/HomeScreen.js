@@ -1,74 +1,87 @@
-import { useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { useContext, useEffect } from 'react';
+import { useContext, useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { getForecast, getWeather, groupDaily } from '../api/weatherApi';
+import CozyBackground from '../components/CozyBackground';
+import CurrentWeatherCard from '../components/CurrentWeatherCard';
+import HourlyForecast from '../components/HourlyForecast';
+import WeatherDetails from '../components/WeatherDetails';
+import WeatherHeader from '../components/WeatherHeader';
+import WeeklyForecast from '../components/WeeklyForecast';
+import { gradientForCondition } from '../theme/cozyTheme';
 import { ThemeContext } from '../theme/ThemeContext';
-import { getWeather } from '../api/weatherApi';
 
 export default function HomeScreen({ navigation }) {
   const { setAccentFromWeather } = useContext(ThemeContext);
   const [city, setCity] = useState('');
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [forecast, setForecast] = useState(null);
 
   const fetchWeather = async () => {
     if (!city) return;
     setLoading(true);
+    setError('');
     const data = await getWeather(city);
+    if (!data || (data.cod && Number(data.cod) !== 200)) {
+      setError('Grad nije pronađen. Pokušaj ponovo.');
+      setWeather(null);
+      setLoading(false);
+      return;
+    }
     setWeather(data);
     setLoading(false);
     try {
       const condition = data?.weather?.[0]?.main || data?.weather?.[0]?.description;
       setAccentFromWeather(condition);
     } catch {}
+    try {
+      const f = await getForecast(city);
+      setForecast(f);
+    } catch {}
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Vremenska prognoza</Text>
+      <CozyBackground colors={gradientForCondition(weather?.weather?.[0]?.main, true)} />
+      <ScrollView contentContainerStyle={{ paddingBottom: 32 }} style={{ width: '100%' }}>
+        <WeatherHeader city={weather?.name || 'Grad'} />
 
-      <View style={styles.card}>
-        <TextInput
-          style={styles.input}
-          placeholder="Unesi grad..."
-          placeholderTextColor="#8091A2"
-          value={city}
-          onChangeText={setCity}
-        />
+        <View style={styles.card}>
+          <TextInput
+            style={styles.input}
+            placeholder="Unesi grad..."
+            placeholderTextColor="#8091A2"
+            value={city}
+            onChangeText={setCity}
+          />
 
-        <Pressable style={styles.primaryButton} onPress={fetchWeather}>
-          <Text style={styles.primaryButtonText}>Prikaži vrijeme</Text>
-        </Pressable>
-      </View>
-
-      {loading && <ActivityIndicator size="large" color="#5EE1FF" style={{ marginTop: 24 }} />}
-
-      {weather && weather.main && (
-        <View style={styles.result}>
-          <Text style={styles.city}>{weather.name}</Text>
-          <Text style={styles.temp}>{Math.round(weather.main.temp)}°C</Text>
-          <Text style={styles.desc}>{weather.weather[0].description}</Text>
-
-          <View style={styles.actionsRow}>
-            <Pressable
-              style={[styles.secondaryButton, { marginRight: 12 }]}
-              onPress={() => navigation.navigate('detalji', { weather })}
-            >
-              <Text style={styles.secondaryButtonText}>Detalji</Text>
-            </Pressable>
-            <Pressable
-              style={styles.secondaryButton}
-              onPress={() =>
-                navigation.navigate('prognoza', {
-                  city: weather.name,
-                  apiKey: 'ed0604f6922da175d2395178306397bd',
-                })
-              }
-            >
-              <Text style={styles.secondaryButtonText}>5-dnevna</Text>
-            </Pressable>
-          </View>
+          <Pressable style={styles.primaryButton} onPress={fetchWeather}>
+            <Text style={styles.primaryButtonText}>Prikaži vrijeme</Text>
+          </Pressable>
         </View>
-      )}
+
+        {loading && <ActivityIndicator size="large" color="#5EE1FF" style={{ marginTop: 24 }} />}
+        {!!error && (
+          <View style={[styles.result, { borderColor: 'rgba(255,180,162,0.35)' }]}> 
+            <Text style={{ color: '#FFB4A2' }}>{error}</Text>
+          </View>
+        )}
+
+        {weather && weather.main && (
+          <View>
+            <CurrentWeatherCard isDark temp={weather.main.temp} condition={weather.weather[0].description} />
+            <WeatherDetails isDark feelsLike={weather.main.feels_like} humidity={weather.main.humidity} wind={weather.wind.speed} />
+          </View>
+        )}
+
+        {forecast?.list && (
+          <>
+            <HourlyForecast isDark list={forecast.list} />
+            <WeeklyForecast isDark days={groupDaily(forecast.list)} />
+          </>
+        )}
+      </ScrollView>
     </View>
   );
 }
