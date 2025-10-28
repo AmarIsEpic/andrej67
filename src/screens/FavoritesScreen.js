@@ -148,6 +148,7 @@ export default function FavoritesScreen({ navigation }) {
                         onRemove={handleRemoveFavorite}
                         isDark={isDark}
                         units={units}
+                        styles={styles}
                     />
                 )}
                 ListHeaderComponent={() => (

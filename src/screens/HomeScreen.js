@@ -48,7 +48,7 @@ export default function HomeScreen({ navigation }) {
     <View style={[styles.container, isDark ? styles.containerDark : styles.containerLight]}>
       {!isDark && <CozyBackground colors={gradientForCondition(weather?.weather?.[0]?.main, false)} />}
       <ScrollView contentContainerStyle={{ paddingBottom: 32 }} style={{ width: '100%' }}>
-        <WeatherHeader city={weather?.name || 'Grad'} />
+        <WeatherHeader city={weather?.name || 'Grad'} isDark={isDark} />
 
         <View style={[styles.card, isDark ? styles.cardDark : styles.cardLight]}>
           <TextInput

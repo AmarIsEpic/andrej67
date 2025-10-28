@@ -19,8 +19,18 @@ export default function WeatherDetails({ feelsLike, humidity, wind, isDark, unit
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: 10, marginTop: 14 },
-  item: { flex: 1, backgroundColor: '#FFFFFF', borderRadius: 16, padding: 12 },
-  itemDark: { backgroundColor: '#151B2D' },
+  item: { 
+    flex: 1, 
+    backgroundColor: '#FFFFFF', 
+    borderRadius: 16, 
+    padding: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(94,225,255,0.2)',
+  },
+  itemDark: { 
+    backgroundColor: '#151B2D',
+    borderColor: 'rgba(94,225,255,0.15)',
+  },
   label: { color: '#6B7280', marginBottom: 4, fontFamily: 'Nunito_400Regular' },
   darkText: { color: '#B8C0CC' },
   value: { color: '#2B3A55', fontFamily: 'Nunito_700Bold' },
