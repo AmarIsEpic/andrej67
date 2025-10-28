@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react';
 import { Alert, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { ThemeContext } from '../theme/ThemeContext';
+import ThemeSwitcher from '../components/ThemeSwitcher';
 
 export default function SettingsScreen() {
     const [isCelsius, setIsCelsius] = useState(true);
@@ -40,6 +41,8 @@ return (
         <TouchableOpacity style={styles.saveButton} onPress={() => Alert.alert('Sačuvano', 'Postavke su sačuvane.') }>
             <Text style={styles.saveText}>Sačuvaj postavke</Text>
         </TouchableOpacity>
+
+        <ThemeSwitcher />
     </View>
 );
 }

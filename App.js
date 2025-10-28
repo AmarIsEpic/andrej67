@@ -1,3 +1,5 @@
+import { Nunito_400Regular, Nunito_700Bold, Nunito_800ExtraBold, useFonts } from '@expo-google-fonts/nunito';
+import { Quicksand_600SemiBold } from '@expo-google-fonts/quicksand';
 import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useColorScheme } from 'react-native';
@@ -13,6 +15,12 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   const scheme = useColorScheme();
+  const [fontsLoaded] = useFonts({
+    Nunito_400Regular,
+    Nunito_700Bold,
+    Nunito_800ExtraBold,
+    Quicksand_600SemiBold,
+  });
 
   const FuturisticDarkTheme = {
     ...DarkTheme,
@@ -27,6 +35,7 @@ export default function App() {
     },
   };
 
+  if (!fontsLoaded) return null;
   return (
     <ThemeProvider>
       <ThemeContext.Consumer>
@@ -36,7 +45,7 @@ export default function App() {
             <Stack.Navigator
               screenOptions={{
                 headerStyle: { backgroundColor: isDark ? '#0F1621' : '#FFFFFF' },
-                headerTitleStyle: { fontWeight: '700', letterSpacing: 0.5 },
+                headerTitleStyle: { fontFamily: 'Nunito_700Bold', letterSpacing: 0.5 },
                 headerTintColor: isDark ? '#E6EDF3' : '#0B0F14',
                 contentStyle: { backgroundColor: isDark ? '#0B0F14' : '#F7F9FC' },
               }}
