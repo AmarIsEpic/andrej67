@@ -17,7 +17,8 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🌤️ Vremenska prognoza</Text>
+      <Text style={styles.title}>Vremenska prognoza</Text>
+
       <TextInput
         style={styles.input}
         placeholder="Unesi grad..."
@@ -33,9 +34,19 @@ export default function HomeScreen({ navigation }) {
           <Text style={styles.city}>{weather.name}</Text>
           <Text style={styles.temp}>{Math.round(weather.main.temp)}°C</Text>
           <Text>{weather.weather[0].description}</Text>
+
           <Button
             title="Detalji"
-            onPress={() => navigation.navigate('Detalji', { weather })}
+            onPress={() => navigation.navigate('detalji', { weather })}
+          />
+          <Button
+            title="5-dnevna prognoza"
+            onPress={() =>
+              navigation.navigate('prognoza', {
+                city: weather.name,
+                apiKey: 'ed0604f6922da175d2395178306397bd',
+              })
+            }
           />
         </View>
       )}
@@ -43,23 +54,13 @@ export default function HomeScreen({ navigation }) {
   );
 }
 
-<Button
-  title="5-dnevna prognoza"
-  onPress={() =>
-    navigation.navigate('Prognoza', {
-      city: weather.name,
-      apiKey: 'ed0604f6922da175d2395178306397bd',
-    })
-  }
-/>
-
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+    backgroundColor: '#fff',
   },
   title: {
     fontSize: 28,

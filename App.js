@@ -2,9 +2,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import DetailsScreen from './src/screens/DetailsScreen';
 import FavoritesScreen from './src/screens/FavoritesScreen';
-import ForecastScreen from './src/screens/ForecastSreenScreen';
+import ForecastScreen from './src/screens/ForecastScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
