@@ -1,10 +1,11 @@
-import { Ionicons } from '@expo/vector-icons';
 import { Nunito_400Regular, Nunito_700Bold, Nunito_800ExtraBold, useFonts } from '@expo-google-fonts/nunito';
 import { Quicksand_600SemiBold } from '@expo-google-fonts/quicksand';
+import { Ionicons } from '@expo/vector-icons';
 import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useColorScheme } from 'react-native';
+import { useColorScheme, View } from 'react-native';
 import AnimatedBackground from './src/components/AnimatedBackground';
+import { FavoritesProvider } from './src/context/FavoritesContext';
 import DetailsScreen from './src/screens/DetailsScreen';
 import FavoritesScreen from './src/screens/FavoritesScreen';
 import ForecastScreen from './src/screens/ForecastScreen';
@@ -38,7 +39,8 @@ export default function App() {
 
   if (!fontsLoaded) return null;
   return (
-    <ThemeProvider>
+    <FavoritesProvider>
+      <ThemeProvider>
       <ThemeContext.Consumer>
         {({ isDark, accent }) => (
           <NavigationContainer theme={isDark ? FuturisticDarkTheme : DefaultTheme}>
@@ -57,13 +59,22 @@ export default function App() {
                 options={({ navigation }) => ({
                   title: 'Vrijeme',
                   headerRight: () => (
-                    <Ionicons
-                      name="settings"
-                      size={24}
-                      color={isDark ? '#E6EDF3' : '#0B0F14'}
-                      style={{ marginRight: 16 }}
-                      onPress={() => navigation.navigate('postavke')}
-                    />
+                    <View style={{ flexDirection: 'row', marginRight: 8 }}>
+                      <Ionicons
+                        name="heart"
+                        size={24}
+                        color={isDark ? '#E6EDF3' : '#0B0F14'}
+                        style={{ marginRight: 16 }}
+                        onPress={() => navigation.navigate('omiljeni')}
+                      />
+                      <Ionicons
+                        name="settings"
+                        size={24}
+                        color={isDark ? '#E6EDF3' : '#0B0F14'}
+                        style={{ marginRight: 16 }}
+                        onPress={() => navigation.navigate('postavke')}
+                      />
+                    </View>
                   ),
                 })}
               />
@@ -75,6 +86,7 @@ export default function App() {
           </NavigationContainer>
         )}
       </ThemeContext.Consumer>
-    </ThemeProvider>
+      </ThemeProvider>
+    </FavoritesProvider>
   );
 }

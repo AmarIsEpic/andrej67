@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { getForecast, getWeather, groupDaily } from '../api/weatherApi';
 import CozyBackground from '../components/CozyBackground';
@@ -7,16 +7,26 @@ import HourlyForecast from '../components/HourlyForecast';
 import WeatherDetails from '../components/WeatherDetails';
 import WeatherHeader from '../components/WeatherHeader';
 import WeeklyForecast from '../components/WeeklyForecast';
+import { FavoritesContext } from '../context/FavoritesContext';
 import { gradientForCondition } from '../theme/cozyTheme';
 import { ThemeContext } from '../theme/ThemeContext';
 
 export default function HomeScreen({ navigation }) {
-  const { setAccentFromWeather, units, toggleUnits } = useContext(ThemeContext);
+  const { setAccentFromWeather, units, isDark } = useContext(ThemeContext);
+  const { addFavorite, removeFavorite, isFavorite } = useContext(FavoritesContext);
+  const [currentCity, setCurrentCity] = useState(null);
   const [city, setCity] = useState('');
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [forecast, setForecast] = useState(null);
+
+  // Set up favorites icon in header
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => null, // Will be set by App.js for now
+    });
+  }, [navigation]);
 
   const fetchWeather = async () => {
     if (!city) return;
@@ -30,6 +40,7 @@ export default function HomeScreen({ navigation }) {
       return;
     }
     setWeather(data);
+    setCurrentCity(data.name);
     setLoading(false);
     try {
       const condition = data?.weather?.[0]?.main || data?.weather?.[0]?.description;
@@ -42,16 +53,16 @@ export default function HomeScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <CozyBackground colors={gradientForCondition(weather?.weather?.[0]?.main, true)} />
+    <View style={[styles.container, isDark ? styles.containerDark : styles.containerLight]}>
+      {!isDark && <CozyBackground colors={gradientForCondition(weather?.weather?.[0]?.main, false)} />}
       <ScrollView contentContainerStyle={{ paddingBottom: 32 }} style={{ width: '100%' }}>
         <WeatherHeader city={weather?.name || 'Grad'} />
 
-        <View style={styles.card}>
+        <View style={[styles.card, isDark ? styles.cardDark : styles.cardLight]}>
           <TextInput
-            style={styles.input}
+            style={[styles.input, isDark ? styles.inputDark : styles.inputLight]}
             placeholder="Unesi grad..."
-            placeholderTextColor="#8091A2"
+            placeholderTextColor={isDark ? '#8091A2' : '#6B7280'}
             value={city}
             onChangeText={setCity}
           />
@@ -70,6 +81,27 @@ export default function HomeScreen({ navigation }) {
 
         {weather && weather.main && (
           <View>
+            <View style={styles.favoriteContainer}>
+              <Text style={[styles.cityName, isDark ? styles.textDark : styles.textLight]}>
+                {weather.name}
+              </Text>
+              <Pressable
+                onPress={() => {
+                  if (isFavorite(weather.name)) {
+                    removeFavorite(weather.name);
+                  } else {
+                    addFavorite(weather.name);
+                  }
+                }}
+                style={styles.favoriteButton}
+              >
+                <Ionicons
+                  name={isFavorite(weather.name) ? 'heart' : 'heart-outline'}
+                  size={24}
+                  color={isFavorite(weather.name) ? '#FF7D7D' : (isDark ? '#8091A2' : '#6B7280')}
+                />
+              </Pressable>
+            </View>
             <CurrentWeatherCard isDark temp={weather.main.temp} condition={weather.weather[0].description} units={units} />
             <WeatherDetails isDark feelsLike={weather.main.feels_like} humidity={weather.main.humidity} wind={weather.wind.speed} units={units} />
           </View>
@@ -92,7 +124,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+  },
+  containerDark: {
     backgroundColor: '#0B0F14',
+  },
+  containerLight: {
+    backgroundColor: '#F7F9FC',
   },
   title: {
     fontSize: 28,
@@ -102,25 +139,37 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '100%',
-    backgroundColor: 'rgba(255,255,255,0.04)',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: 'rgba(94,225,255,0.15)',
     shadowColor: '#000',
     shadowOpacity: 0.4,
     shadowRadius: 16,
     shadowOffset: { width: 0, height: 8 },
-    backdropFilter: 'blur(10px)',
+  },
+  cardDark: {
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderColor: 'rgba(94,225,255,0.15)',
+  },
+  cardLight: {
+    backgroundColor: '#FFFFFF',
+    borderColor: 'rgba(94,225,255,0.3)',
   },
   input: {
-    backgroundColor: '#0F1621',
     borderWidth: 1,
-    borderColor: '#1B2837',
     borderRadius: 12,
     padding: 12,
-    color: '#E6EDF3',
     marginBottom: 12,
+  },
+  inputDark: {
+    backgroundColor: '#0F1621',
+    borderColor: '#1B2837',
+    color: '#E6EDF3',
+  },
+  inputLight: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#E0E0E0',
+    color: '#0B0F14',
   },
   primaryButton: {
     backgroundColor: '#5EE1FF',
@@ -138,10 +187,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     width: '100%',
-    backgroundColor: 'rgba(255,255,255,0.03)',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(125,92,255,0.15)'
+  },
+  resultDark: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderColor: 'rgba(255,180,162,0.35)',
+  },
+  resultLight: {
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    borderColor: 'rgba(255,180,162,0.5)',
   },
   city: {
     fontSize: 22,
@@ -173,5 +228,26 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     color: '#E6EDF3',
     fontWeight: '600',
+  },
+  favoriteContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 16,
+    paddingHorizontal: 4,
+  },
+  cityName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    fontFamily: 'Nunito_700Bold',
+  },
+  textDark: {
+    color: '#E6EDF3',
+  },
+  textLight: {
+    color: '#0B0F14',
+  },
+  favoriteButton: {
+    padding: 8,
   },
 });

@@ -7,7 +7,7 @@ export default function LocationScreen() {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
   const apiKey = 'ed0604f6922da175d2395178306397bd';
-  const { setAccentFromWeather } = useContext(ThemeContext);
+  const { setAccentFromWeather, units, isDark } = useContext(ThemeContext);
 
   useEffect(() => {
     (async () => {
@@ -23,7 +23,7 @@ export default function LocationScreen() {
 
       try {
         const response = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${apiKey}&lang=hr`
+          `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=${units}&appid=${apiKey}&lang=hr`
         );
         const data = await response.json();
         setWeather(data);
@@ -38,44 +38,74 @@ export default function LocationScreen() {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [units]);
 
   if (loading) {
     return (
-      <View style={styles.center}>
+      <View style={[styles.center, isDark ? styles.containerDark : styles.containerLight]}>
         <ActivityIndicator size="large" color="#5EE1FF" />
-        <Text style={styles.loadingText}>Dohvaćam lokaciju...</Text>
+        <Text style={[styles.loadingText, isDark ? styles.textSecondaryDark : styles.textSecondaryLight]}>
+          Dohvaćam lokaciju...
+        </Text>
       </View>
     );
   }
 
   if (!weather || !weather.main) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.errorText}>Neuspješno dohvaćanje podataka o vremenu.</Text>
+      <View style={[styles.center, isDark ? styles.containerDark : styles.containerLight]}>
+        <Text style={[styles.errorText, isDark ? styles.errorTextDark : styles.errorTextLight]}>
+          Neuspješno dohvaćanje podataka o vremenu.
+        </Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Vrijeme na tvojoj lokaciji</Text>
-      <Text style={styles.city}>{weather.name}</Text>
+    <View style={[styles.container, isDark ? styles.containerDark : styles.containerLight]}>
+      <Text style={[styles.title, isDark ? styles.textDark : styles.textLight]}>
+        Vrijeme na tvojoj lokaciji
+      </Text>
+      <Text style={[styles.city, isDark ? styles.textDark : styles.textLight]}>{weather.name}</Text>
 
-      <View style={styles.hero}>
+      <View style={[styles.hero, isDark ? styles.heroDark : styles.heroLight]}>
         <Image
           source={{ uri: `https://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png` }}
           style={{ width: 150, height: 150 }}
         />
-        <Text style={styles.temp}>{Math.round(weather.main.temp)}°C</Text>
-        <Text style={styles.desc}>{weather.weather[0].description}</Text>
+        <Text style={[styles.temp, isDark ? styles.tempDark : styles.tempLight]}>
+          {Math.round(weather.main.temp)}°{units === 'imperial' ? 'F' : 'C'}
+        </Text>
+        <Text style={[styles.desc, isDark ? styles.textSecondaryDark : styles.textSecondaryLight]}>
+          {weather.weather[0].description}
+        </Text>
       </View>
 
-      <View style={styles.infoBox}>
-        <View style={styles.row}><Text style={styles.label}>Osjećaj</Text><Text style={styles.value}>{Math.round(weather.main.feels_like)}°C</Text></View>
-        <View style={styles.row}><Text style={styles.label}>Vlažnost</Text><Text style={styles.value}>{weather.main.humidity}%</Text></View>
-        <View style={styles.row}><Text style={styles.label}>Pritisak</Text><Text style={styles.value}>{weather.main.pressure} hPa</Text></View>
-        <View style={styles.row}><Text style={styles.label}>Vjetar</Text><Text style={styles.value}>{weather.wind.speed} m/s</Text></View>
+      <View style={[styles.infoBox, isDark ? styles.infoBoxDark : styles.infoBoxLight]}>
+        <View style={styles.row}>
+          <Text style={[styles.label, isDark ? styles.labelDark : styles.labelLight]}>Osjećaj</Text>
+          <Text style={[styles.value, isDark ? styles.valueDark : styles.valueLight]}>
+            {Math.round(weather.main.feels_like)}°{units === 'imperial' ? 'F' : 'C'}
+          </Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={[styles.label, isDark ? styles.labelDark : styles.labelLight]}>Vlažnost</Text>
+          <Text style={[styles.value, isDark ? styles.valueDark : styles.valueLight]}>
+            {weather.main.humidity}%
+          </Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={[styles.label, isDark ? styles.labelDark : styles.labelLight]}>Pritisak</Text>
+          <Text style={[styles.value, isDark ? styles.valueDark : styles.valueLight]}>
+            {weather.main.pressure} hPa
+          </Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={[styles.label, isDark ? styles.labelDark : styles.labelLight]}>Vjetar</Text>
+          <Text style={[styles.value, isDark ? styles.valueDark : styles.valueLight]}>
+            {weather.wind.speed} m/s
+          </Text>
+        </View>
       </View>
     </View>
   );
@@ -87,57 +117,132 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#0B0F14',
   },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  containerDark: {
     backgroundColor: '#0B0F14',
+  },
+  containerLight: {
+    backgroundColor: '#F7F9FC',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
+    fontFamily: 'Nunito_800ExtraBold',
+  },
+  textDark: {
     color: '#E6EDF3',
+  },
+  textLight: {
+    color: '#0B0F14',
   },
   city: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#E6EDF3',
+    fontFamily: 'Nunito_700Bold',
   },
   hero: {
     marginTop: 8,
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.03)',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: 'rgba(94,225,255,0.12)'
+    marginBottom: 16,
+  },
+  heroDark: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderColor: 'rgba(94,225,255,0.12)',
+  },
+  heroLight: {
+    backgroundColor: '#FFFFFF',
+    borderColor: 'rgba(94,225,255,0.3)',
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
   },
   temp: {
     fontSize: 56,
     fontWeight: 'bold',
+    fontFamily: 'Quicksand_600SemiBold',
+  },
+  tempDark: {
     color: '#5EE1FF',
+  },
+  tempLight: {
+    color: '#0B0F14',
   },
   desc: {
     fontSize: 18,
     marginBottom: 10,
     textTransform: 'capitalize',
+    fontFamily: 'Nunito_400Regular',
+  },
+  textSecondaryDark: {
     color: '#B8C4CF',
+  },
+  textSecondaryLight: {
+    color: '#6B7280',
   },
   infoBox: {
     width: '100%',
     marginTop: 16,
-    backgroundColor: 'rgba(255,255,255,0.03)',
     borderRadius: 16,
     padding: 12,
     borderWidth: 1,
-    borderColor: 'rgba(125,92,255,0.15)'
   },
-  row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 6 },
-  label: { color: '#B8C4CF' },
-  value: { color: '#E6EDF3', fontWeight: '600' },
-  loadingText: { color: '#B8C4CF', marginTop: 10 },
-  errorText: { color: '#FF7D7D' },
+  infoBoxDark: {
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderColor: 'rgba(125,92,255,0.15)',
+  },
+  infoBoxLight: {
+    backgroundColor: '#FFFFFF',
+    borderColor: 'rgba(94,225,255,0.3)',
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 6,
+  },
+  label: {
+    fontFamily: 'Nunito_400Regular',
+  },
+  labelDark: {
+    color: '#B8C4CF',
+  },
+  labelLight: {
+    color: '#6B7280',
+  },
+  value: {
+    fontWeight: '600',
+    fontFamily: 'Quicksand_600SemiBold',
+  },
+  valueDark: {
+    color: '#E6EDF3',
+  },
+  valueLight: {
+    color: '#0B0F14',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontFamily: 'Nunito_400Regular',
+  },
+  errorText: {
+    fontFamily: 'Nunito_700Bold',
+  },
+  errorTextDark: {
+    color: '#FF7D7D',
+  },
+  errorTextLight: {
+    color: '#E63946',
+  },
 });
