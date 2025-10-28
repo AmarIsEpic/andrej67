@@ -5,6 +5,70 @@ import { getWeather } from '../api/weatherApi';
 import { FavoritesContext } from '../context/FavoritesContext';
 import { ThemeContext } from '../theme/ThemeContext';
 
+const FavoriteCard = ({ item, onPress, onRemove, isDark, units, styles }) => (
+    <Pressable
+        style={[styles.card, isDark ? styles.cardDark : styles.cardLight]}
+        onPress={onPress}
+    >
+        <View style={styles.cardContent}>
+            <View style={styles.leftSection}>
+                <View style={styles.headerRow}>
+                    <Text style={[styles.cityName, isDark ? styles.textDark : styles.textLight]}>
+                        {item.city}
+                    </Text>
+                    <Pressable
+                        style={styles.heartButton}
+                        onPress={() => onRemove(item.city)}
+                    >
+                        <Ionicons name="heart" size={22} color="#FF7D7D" />
+                    </Pressable>
+                </View>
+                
+                {item.weather && item.weather.main && (
+                    <View style={styles.weatherRow}>
+                        <Text style={[styles.temp, isDark ? styles.tempDark : styles.tempLight]}>
+                            {Math.round(item.weather.main.temp)}°
+                        </Text>
+                        <Text style={[styles.unitLabel, isDark ? styles.textSecondaryDark : styles.textSecondaryLight]}>
+                            {units === 'imperial' ? 'F' : 'C'}
+                        </Text>
+                        {item.weather.weather && item.weather.weather[0] && (
+                            <View style={styles.conditionRow}>
+                                <Image
+                                    source={{
+                                        uri: `https://openweathermap.org/img/wn/${item.weather.weather[0].icon}@2x.png`,
+                                    }}
+                                    style={{ width: 40, height: 40 }}
+                                />
+                                <Text style={[styles.condition, isDark ? styles.textSecondaryDark : styles.textSecondaryLight]}>
+                                    {item.weather.weather[0].description}
+                                </Text>
+                            </View>
+                        )}
+                    </View>
+                )}
+                
+                {item.weather && item.weather.main && (
+                    <View style={[styles.detailsRow, { borderTopColor: isDark ? 'rgba(138, 180, 248, 0.15)' : 'rgba(94, 225, 255, 0.2)' }]}>
+                        <View style={styles.detailItem}>
+                            <Ionicons name="water" size={16} color={isDark ? '#5EE1FF' : '#8AB4F8'} />
+                            <Text style={[styles.detailText, isDark ? styles.textSecondaryDark : styles.textSecondaryLight]}>
+                                {item.weather.main.humidity}%
+                            </Text>
+                        </View>
+                        <View style={styles.detailItem}>
+                            <Ionicons name="speedometer" size={16} color={isDark ? '#5EE1FF' : '#8AB4F8'} />
+                            <Text style={[styles.detailText, isDark ? styles.textSecondaryDark : styles.textSecondaryLight]}>
+                                {item.weather.main.pressure} hPa
+                            </Text>
+                        </View>
+                    </View>
+                )}
+            </View>
+        </View>
+    </Pressable>
+);
+
 export default function FavoritesScreen({ navigation }) {
     const { favorites, removeFavorite, addFavorite, isFavorite } = useContext(FavoritesContext);
     const { isDark, units } = useContext(ThemeContext);
@@ -78,39 +142,13 @@ export default function FavoritesScreen({ navigation }) {
                 keyExtractor={(item) => item.city}
                 contentContainerStyle={styles.list}
                 renderItem={({ item }) => (
-                    <Pressable
-                        style={[styles.card, isDark ? styles.cardDark : styles.cardLight]}
+                    <FavoriteCard
+                        item={item}
                         onPress={() => handleFavoritePress(item)}
-                    >
-                        <View style={styles.cardContent}>
-                            <View style={styles.weatherInfo}>
-                                <Text style={[styles.cityName, isDark ? styles.textDark : styles.textLight]}>
-                                    {item.city}
-                                </Text>
-                                {item.weather && item.weather.main && (
-                                    <Text style={[styles.temp, isDark ? styles.tempDark : styles.tempLight]}>
-                                        {Math.round(item.weather.main.temp)}°{units === 'imperial' ? 'F' : 'C'}
-                                    </Text>
-                                )}
-                            </View>
-                            {item.weather && item.weather.weather && (
-                                <View style={styles.weatherIcon}>
-                                    <Image
-                                        source={{
-                                            uri: `https://openweathermap.org/img/wn/${item.weather.weather[0].icon}.png`,
-                                        }}
-                                        style={{ width: 50, height: 50 }}
-                                    />
-                                </View>
-                            )}
-                        </View>
-                        <Pressable
-                            style={styles.removeButton}
-                            onPress={() => handleRemoveFavorite(item.city)}
-                        >
-                            <Ionicons name="close-circle" size={24} color="#FF7D7D" />
-                        </Pressable>
-                    </Pressable>
+                        onRemove={handleRemoveFavorite}
+                        isDark={isDark}
+                        units={units}
+                    />
                 )}
                 ListHeaderComponent={() => (
                     <View style={styles.header}>
@@ -170,39 +208,53 @@ const styles = StyleSheet.create({
         color: '#6B7280',
     },
     card: {
-        borderRadius: 16,
-        padding: 16,
-        marginBottom: 12,
+        borderRadius: 20,
+        padding: 18,
+        marginBottom: 16,
         borderWidth: 1,
     },
     cardDark: {
-        backgroundColor: 'rgba(255,255,255,0.03)',
-        borderColor: 'rgba(94,225,255,0.15)',
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        borderColor: 'rgba(94,225,255,0.2)',
     },
     cardLight: {
         backgroundColor: '#FFFFFF',
-        borderColor: 'rgba(94,225,255,0.3)',
+        borderColor: 'rgba(94,225,255,0.4)',
         shadowColor: '#000',
-        shadowOpacity: 0.08,
-        shadowRadius: 8,
-        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 12,
+        shadowOffset: { width: 0, height: 6 },
+        elevation: 3,
     },
     cardContent: {
+        width: '100%',
+    },
+    leftSection: {
+        flex: 1,
+    },
+    headerRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-    },
-    weatherInfo: {
-        flex: 1,
+        marginBottom: 12,
     },
     cityName: {
-        fontSize: 20,
-        fontWeight: '600',
-        marginBottom: 4,
+        fontSize: 22,
+        fontWeight: '700',
         fontFamily: 'Nunito_700Bold',
+        flex: 1,
+    },
+    heartButton: {
+        padding: 4,
+        marginLeft: 8,
+    },
+    weatherRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 12,
     },
     temp: {
-        fontSize: 24,
+        fontSize: 36,
         fontWeight: 'bold',
         fontFamily: 'Quicksand_600SemiBold',
     },
@@ -212,12 +264,39 @@ const styles = StyleSheet.create({
     tempLight: {
         color: '#0B0F14',
     },
-    weatherIcon: {
+    unitLabel: {
+        fontSize: 18,
+        fontWeight: '600',
+        marginTop: 4,
+        fontFamily: 'Quicksand_600SemiBold',
+    },
+    conditionRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
         marginLeft: 12,
     },
-    removeButton: {
+    condition: {
+        fontSize: 14,
+        textTransform: 'capitalize',
+        marginLeft: 6,
+        fontFamily: 'Nunito_400Regular',
+    },
+    detailsRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
         marginTop: 8,
-        alignSelf: 'flex-end',
+        paddingTop: 12,
+        borderTopWidth: 1,
+        gap: 20,
+    },
+    detailItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+    },
+    detailText: {
+        fontSize: 13,
+        fontFamily: 'Nunito_400Regular',
     },
     emptyText: {
         fontSize: 20,
