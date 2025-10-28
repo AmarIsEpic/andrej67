@@ -3,7 +3,7 @@ import { Quicksand_600SemiBold } from '@expo-google-fonts/quicksand';
 import { Ionicons } from '@expo/vector-icons';
 import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useColorScheme, View } from 'react-native';
+import { Pressable, useColorScheme, View } from 'react-native';
 import AnimatedBackground from './src/components/AnimatedBackground';
 import { FavoritesProvider } from './src/context/FavoritesContext';
 import DetailsScreen from './src/screens/DetailsScreen';
@@ -60,20 +60,26 @@ export default function App() {
                   title: 'Vrijeme',
                   headerRight: () => (
                     <View style={{ flexDirection: 'row', marginRight: 8 }}>
-                      <Ionicons
-                        name="heart"
-                        size={24}
-                        color={isDark ? '#E6EDF3' : '#0B0F14'}
-                        style={{ marginRight: 16 }}
+                      <Pressable
                         onPress={() => navigation.navigate('omiljeni')}
-                      />
-                      <Ionicons
-                        name="settings"
-                        size={24}
-                        color={isDark ? '#E6EDF3' : '#0B0F14'}
-                        style={{ marginRight: 16 }}
+                        style={{ marginRight: 16, padding: 4 }}
+                      >
+                        <Ionicons
+                          name="heart"
+                          size={24}
+                          color={isDark ? '#E6EDF3' : '#0B0F14'}
+                        />
+                      </Pressable>
+                      <Pressable
                         onPress={() => navigation.navigate('postavke')}
-                      />
+                        style={{ marginRight: 16, padding: 4 }}
+                      >
+                        <Ionicons
+                          name="settings"
+                          size={24}
+                          color={isDark ? '#E6EDF3' : '#0B0F14'}
+                        />
+                      </Pressable>
                     </View>
                   ),
                 })}

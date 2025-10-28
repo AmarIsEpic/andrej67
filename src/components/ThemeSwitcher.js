@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { StyleSheet, Switch, Text, View } from 'react-native';
 import { ThemeContext } from '../theme/ThemeContext';
 
@@ -14,9 +14,19 @@ export default function ThemeSwitcher() {
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 16 },
-  col: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  label: { color: '#2B3A55' },
+  row: { 
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+     marginTop: 16 
+  },
+  col: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8 
+  },
+  label: {
+     color: '#2B3A55' 
+  },
 });
 
 

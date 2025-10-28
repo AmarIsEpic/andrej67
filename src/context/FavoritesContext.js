@@ -44,8 +44,11 @@ export function FavoritesProvider({ children }) {
   }, [favorites, isLoaded]);
 
   const addFavorite = useCallback(async (city) => {
-    if (!city || isFavorite(city)) return;
-    setFavorites((prev) => [...prev, city]);
+    if (!city) return;
+    setFavorites((prev) => {
+      if (prev.includes(city)) return prev;
+      return [...prev, city];
+    });
   }, []);
 
   const removeFavorite = useCallback(async (city) => {

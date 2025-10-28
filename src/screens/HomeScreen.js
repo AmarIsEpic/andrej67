@@ -1,4 +1,5 @@
-import { useContext, useEffect, useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { useContext, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { getForecast, getWeather, groupDaily } from '../api/weatherApi';
 import CozyBackground from '../components/CozyBackground';
@@ -14,19 +15,11 @@ import { ThemeContext } from '../theme/ThemeContext';
 export default function HomeScreen({ navigation }) {
   const { setAccentFromWeather, units, isDark } = useContext(ThemeContext);
   const { addFavorite, removeFavorite, isFavorite } = useContext(FavoritesContext);
-  const [currentCity, setCurrentCity] = useState(null);
   const [city, setCity] = useState('');
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [forecast, setForecast] = useState(null);
-
-  // Set up favorites icon in header
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => null, // Will be set by App.js for now
-    });
-  }, [navigation]);
 
   const fetchWeather = async () => {
     if (!city) return;
@@ -40,7 +33,6 @@ export default function HomeScreen({ navigation }) {
       return;
     }
     setWeather(data);
-    setCurrentCity(data.name);
     setLoading(false);
     try {
       const condition = data?.weather?.[0]?.main || data?.weather?.[0]?.description;
@@ -74,7 +66,7 @@ export default function HomeScreen({ navigation }) {
 
         {loading && <ActivityIndicator size="large" color="#5EE1FF" style={{ marginTop: 24 }} />}
         {!!error && (
-          <View style={[styles.result, { borderColor: 'rgba(255,180,162,0.35)' }]}> 
+          <View style={[styles.result, isDark ? styles.resultDark : styles.resultLight]}> 
             <Text style={{ color: '#FFB4A2' }}>{error}</Text>
           </View>
         )}
